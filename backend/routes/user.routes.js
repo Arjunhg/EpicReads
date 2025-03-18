@@ -99,13 +99,14 @@ router.post('/sign-in', async (req, res) => {
             )
         }
 
-        const authClaims = {
-            name: findUserByUsername.username,
-            role: findUserByUsername.role
-        }
+        // const authClaims = {
+        //     name: findUserByUsername.username,
+        //     role: findUserByUsername.role
+        // }
+
 
         const token = jwt.sign(
-            { authClaims },
+            { id: findUserByUsername._id, name: findUserByUsername.username, role: findUserByUsername.role },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
         )
@@ -128,7 +129,7 @@ router.post('/sign-in', async (req, res) => {
 
 router.get('/get-user-information', authenticateToken, async(req, res) => {
     try {
-        const { id } = req.headers;
+        const { id } = req.user;
         const data = await User.findById(id).select('-password');
         if(!data){
             return res.status(404).json(
@@ -149,11 +150,19 @@ router.get('/get-user-information', authenticateToken, async(req, res) => {
 
 router.put('/update-address', authenticateToken, async(req, res) => {
     try {
-        const { id } = req.headers;
+        const { id } = req.user;
 
         const { address } = req.body;
 
-        await User.findByIdAndUpdate(id, { address });
+        const updatedUser = await User.findByIdAndUpdate(id, { address }, { new: true, runValidators: true });
+
+        if(!updatedUser){
+            return res.status(404).json(
+                {
+                    message: "User not found"
+                }
+            )
+        }
 
         return res.status(200).json(
             {
