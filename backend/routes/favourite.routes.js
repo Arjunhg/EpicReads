@@ -52,7 +52,7 @@ router.put('/add-book-to-favourite/:bookId', authenticateToken, async(req, res) 
 })
 
 // remove from favourite
-router.delete('/remove-book-from-favourite/:bookId', authenticateToken, async(req, res) => {
+router.put('/remove-book-from-favourite/:bookId', authenticateToken, async(req, res) => {
     try {
         const { id } = req.user;
         const { bookId } = req.params;
@@ -132,5 +132,7 @@ router.get('/get-all-favourites', authenticateToken, async(req, res) => {
         )
     }
 })
+
+
 
 module.exports = router;
