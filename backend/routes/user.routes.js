@@ -111,11 +111,17 @@ router.post('/sign-in', async (req, res) => {
             { expiresIn: '1d' }
         )
 
+        res.cookie('authToken', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000
+        })
+
         return res.status(200).json(
             {
                 id: findUserByUsername._id,
                 role: findUserByUsername.role,
-                token
             }
         )
     } catch (error) {

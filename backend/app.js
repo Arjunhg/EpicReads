@@ -1,5 +1,6 @@
 require('dotenv').config();
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const express = require('express');
 const app = express();
 const connectDB = require('./config/db');
@@ -11,7 +12,11 @@ const Order = require('./routes/order.routes');
 
 connectDB();
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true
+}));
+app.use(cookieParser());
 
 app.use(express.json());
 
