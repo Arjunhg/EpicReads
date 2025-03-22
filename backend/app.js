@@ -9,6 +9,7 @@ const Book = require('./routes/book.routes');
 const Favourite = require('./routes/favourite.routes');
 const Cart = require('./routes/cart.routes');
 const Order = require('./routes/order.routes');
+const Auth = require('./routes/auth.routes');
 
 connectDB();
 
@@ -24,7 +25,8 @@ app.use('/api/v1', User)
 app.use('/api/v1', Book)
 app.use('/api/v1', Favourite)
 app.use('/api/v1', Cart)
-app.use('/app/v1', Order)
+app.use('/api/v1', Order)
+app.use('/api/v1', Auth);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);

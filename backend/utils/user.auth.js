@@ -5,7 +5,7 @@ const authenticateToken = (req, res, next) => {
     // const authHeader = req.headers["authorization"]; for localStorage flow
     // const token = authHeader && authHeader.split(" ")[1]; for localStorage flow
 
-    const token = req.cookies.token; // for cookie flow
+    const token = req.cookies.authToken; // for cookie flow
     
 
     if(!token){
