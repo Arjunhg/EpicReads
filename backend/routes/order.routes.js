@@ -72,7 +72,7 @@ router.post('/place-order', authenticateToken, async(req, res) => {
 })
 
 // get order history of particular user
-app.get('/get-order-history', authenticateToken, async (req, res) => {
+router.get('/get-order-history', authenticateToken, async (req, res) => {
     try {
         
         const  { id } = req.user;
