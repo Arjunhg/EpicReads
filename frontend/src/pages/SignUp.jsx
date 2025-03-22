@@ -1,7 +1,13 @@
-import React, { useState } from 'react'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import Message from '../components/Message/Message';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
+
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -9,9 +15,42 @@ const SignUp = () => {
     address: ''
   });
 
-  const handleSubmit = (e) => {
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    // Handle signup logic here
+    setError('');
+    setSuccess('');
+    setIsSubmitting(true);
+
+    try {
+      const response = await axios.post('http://localhost:3000/api/v1/sign-up', {
+        username: formData.username.trim(),
+        email: formData.email.trim(),
+        password: formData.password.trim(),
+        address: formData.address
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      setSuccess(response.data.message);
+      setFormData({
+        username: '',
+        email: '',
+        password: '',
+        address: ''
+      })
+
+      // setTimeout(() => window.location.href = '/login', 2000);
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (error) {
+      setError(error.response?.data?.message || 'An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -22,6 +61,14 @@ const SignUp = () => {
             Create Account
           </span>
         </h2>
+
+        {/* success and error message */}
+        {
+          error && <Message type="error" message={error}/>
+        }
+        {
+          success && <Message type="success" message={success}/>
+        }
 
         <form onSubmit={handleSubmit} className='space-y-6'>
           {[
@@ -46,9 +93,14 @@ const SignUp = () => {
 
           <button
             type="submit"
-            className='w-full py-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium transition-all duration-300 transform hover:scale-[1.02]'
+            disabled={isSubmitting}
+            className={`w-full py-3 rounded-lg text-white font-medium transition-all duration-300 transform hover:scale-[1.02] ${
+              isSubmitting
+                ? 'bg-gray-500 cursor-not-allowed'
+                : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600'
+            }`}
           >
-            Sign Up
+            {isSubmitting ? 'Signing Up...' : 'Sign Up'}
           </button>
         </form>
 

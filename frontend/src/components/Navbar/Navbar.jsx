@@ -1,26 +1,35 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import React, { useCallback, useMemo, useState } from 'react'
+import { useSelector } from 'react-redux';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const links = [
-    {
-      title: "Home",
-      link: '/'
-    },
-    {
-      title: "All Books",
-      link: '/all-books'
-    }, 
-    {
-      title: "Cart",
-      link: '/cart'
-    }, 
-    {
-      title: "Profile",
-      link: '/profile'
-    }
-  ]
+  const {isLoggedIn, isLoading} = useSelector((state) => state.auth); //tells current state of user
+  const location = useLocation();
+
+  const links = useMemo(() => {
+    const baseLinks = [
+      { title: 'Home', link: '/' },
+      { title: 'All Books', link: '/all-books' },
+      { title: "Cart", link: '/cart' },
+      { title: "Profile", link: '/profile' }
+    ]
+    return isLoggedIn ? baseLinks : baseLinks.slice(0, 2)
+  }, [isLoggedIn])
+
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen((prev) => !prev);
+  }, [])
+
+  const isActive = useCallback((path) => {
+    if(path==='/' && location.pathname === '/') return true;
+
+    return path !== '/' && location.pathname.startsWith(path);
+  }, [location.pathname])
+
+  if (isLoading) {
+    return null; // Avoid rendering the navbar until the auth state is determined
+  }
 
   return (
     <div className='bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 text-white shadow-lg'>
@@ -40,7 +49,7 @@ const Navbar = () => {
           {/* Mobile menu button */}
           <div className='md:hidden'>
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={toggleMenu}
               className='p-2 rounded-md hover:bg-zinc-700'
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -59,44 +68,57 @@ const Navbar = () => {
               {links.map((item, i) => (
                 <Link 
                   to={item.link}
-                  className='hover:text-blue-400 cursor-pointer transition-colors duration-300 text-sm font-medium' 
+                  className={`cursor-pointer transition-colors duration-300 text-sm font-medium ${isActive(item.link) ? 'text-blue-400 font-bold' : 'hover:text-blue-400'}` }
                   key={i}
                 >
                   {item.title}
                 </Link>
               ))}
             </div>
-            <div className='flex gap-4'>
-              <Link to='/login' className='px-4 py-2 rounded-full text-sm font-medium border border-blue-500 hover:bg-blue-500 hover:text-white transition-all duration-300'>
-                Sign In
-              </Link>
-              <Link to='/signup' className='px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-300'>
-                Sign Up
-              </Link>
-            </div>
+
+            {
+              isLoggedIn === false && (
+                <div className='flex gap-4'>
+                  <Link to='/login' className='px-4 py-2 rounded-full text-sm font-medium border border-blue-500 hover:bg-blue-500 hover:text-white transition-all duration-300'>
+                    Sign In
+                  </Link>
+                  <Link to='/signup' className='px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-300'>
+                    Sign Up
+                  </Link>
+                </div>
+              )
+            }  
           </div>
         </div>
 
         {/* Mobile menu items */}
         {isMenuOpen && (
-          <div className='md:hidden mt-4 pb-4'>
+          <div className='md:hidden mt-4 pb-4 flex flex-col space-y-3'>
             {links.map((item, i) => (
               <Link 
                 to={item.link}
-                className='flex flex-col text-center px-2 py-2 hover:bg-zinc-700 rounded-md cursor-pointer transition-colors duration-200' 
+                className={`block w-full py-2 px-3 rounded-md transition-colors duration-300 text-sm font-medium text-center ${
+                  isActive(item.link) 
+                    ? 'bg-zinc-700 text-blue-400 font-bold' 
+                    : 'hover:bg-zinc-700 hover:text-blue-400'
+                }`}
                 key={i}
               >
                 {item.title}
               </Link>
             ))}
-            <div className='flex flex-col gap-2 mt-4'>
-              <Link to='/login' className='px-4 py-2 rounded-md text-sm font-medium border border-blue-500 hover:bg-blue-500 transition-all duration-300 text-center'>
-                Sign In
-              </Link>
-              <Link to='/signup' className='px-4 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-center'>
-                Sign Up
-              </Link>
-            </div>
+            {
+              isLoggedIn === false && (
+                <div className='flex flex-col space-y-2 mt-2 pt-2 border-t border-zinc-700'>
+                  <Link to='/login' className='w-full text-center px-4 py-2 rounded-md text-sm font-medium border border-blue-500 hover:bg-blue-500 hover:text-white transition-all duration-300'>
+                    Sign In
+                  </Link>
+                  <Link to='/signup' className='w-full text-center px-4 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 transition-all duration-300'>
+                    Sign Up
+                  </Link>
+                </div>
+              )
+            }  
           </div>
         )}
       </div>
