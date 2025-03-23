@@ -5,51 +5,44 @@ const Book = require('../models/book.schema');
 const authenticateToken = require('../utils/user.auth');
 
 // add to favourite
-router.put('/add-book-to-favourite/:bookId', authenticateToken, async(req, res) => {
+router.put('/add-book-to-favourite/:bookId', authenticateToken, async (req, res) => {
     try {
-        
         const { id } = req.user;
-        const  { bookId } = req.params;
+        const { bookId } = req.params;
+
+        if (!bookId) {
+            return res.status(400).json({ message: "Book ID is required" }); 
+        }
 
         const book = await Book.findById(bookId);
-        if(!book){
-            return res.status(404).json(
-                {
-                    message: "Book not found"
-                }
-            )
+        if (!book) {
+            return res.status(404).json({ message: "Book not found" });
         }
 
         const user = await User.findById(id);
-        
-        const isBookFavorite = user.favorites.includes(bookId);
-        if(isBookFavorite){
-            return res.status(400).json(
-                {
-                    message: "Book already in favourites"
-                }
-            )
+        if (!user || !Array.isArray(user.favorites)) {
+            return res.status(400).json({ message: "User data invalid" }); 
+        }
+
+        if (user.favorites.includes(bookId)) {
+            return res.status(200).json({ message: "Book already in favourites" }); 
         }
 
         const updatedUser = await User.findByIdAndUpdate(
             id,
             { $push: { favorites: bookId } },
             { new: true, runValidators: true }
-        )
-        return res.status(200).json(
-            {
-                message: "Book added to favourites",
-                favorites: updatedUser.favorites
-            }
-        )
+        );
+
+        return res.status(200).json({
+            message: "Book added to favourites",
+            favorites: updatedUser.favorites
+        });
     } catch (error) {
-        return res.status(500).json(
-            {
-                message: "Internal Server Error"
-            }
-        )
+        console.error("Error in add-book-to-favourite:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
-})
+});
 
 // remove from favourite
 router.put('/remove-book-from-favourite/:bookId', authenticateToken, async(req, res) => {

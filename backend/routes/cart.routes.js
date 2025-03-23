@@ -31,7 +31,7 @@ router.put('/add-book-to-cart/:bookId', authenticateToken, async(req, res) => {
 
         const isBookInCart =  user.cart.includes(bookId);
         if(isBookInCart){
-            return res.status(400).json(
+            return res.status(200).json(
                 {
                     message: "Book already in cart"
                 }
