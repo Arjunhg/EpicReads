@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 import { authActions } from './store/auth';
 import axios from 'axios';
 import Favourites from "./components/Profile/Favourites";
-import UserOrderHistory from "./components/Profile/UserOrderHistory";
+// import UserOrderHistory from "./components/Profile/UserOrderHistory";
 import Settings from "./components/Profile/Settings";
 
 const App = () => {
@@ -65,7 +65,7 @@ const App = () => {
           <Route exact path="/cart" element={isLoggedIn ? <Cart /> : <Login />} />
           <Route exact path="/profile" element={isLoggedIn ? <Profile /> : <Login />}>
             <Route index element={<Favourites/>}/>
-            <Route path="/profile/orderHistory" element={<UserOrderHistory/>}/>
+            {/* <Route path="/profile/orderHistory" element={<UserOrderHistory/>}/> */}
             <Route path="/profile/settings" element={<Settings/>}/>
           </Route>
           <Route exact path="/book-details/:id" element={<BookDetails />} />
