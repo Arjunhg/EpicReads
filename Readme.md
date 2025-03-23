@@ -8,7 +8,7 @@ Wordstock is a comprehensive full-stack e-commerce platform designed for book lo
 
 ## Demo Video
 
-[Watch the Wordstock Demo](https://youtu.be/your-demo-link-here) <!-- Replace with your actual demo video link -->
+[Watch the Wordstock Demo](https://youtu.be/JGIpeSlcroc) <!-- Replace with your actual demo video link -->
 
 ## Key Features
 
